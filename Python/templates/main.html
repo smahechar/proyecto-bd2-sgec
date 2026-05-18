@@ -164,16 +164,45 @@
 
       {% if user_rol == 'Administrador' %}
       <div style="margin-top:12px">
-        <a href="/api/historial" target="_blank" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
-           Ver Historial
+        <a href="/api/historial/view" target="_blank" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
+          Ver Historial MySQL
+        </a>
+      </div>      {% endif %}
+      {% if user_rol == 'Administrador' %}
+      <div style="margin-top:12px">
+        <a href="/api/mongo/auditorias/view" target="_blank" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
+          Ver Auditorías MongoDB
         </a>
       </div>
-      {% endif %}
+      {% endif %} 
       {% if user_rol == 'Administrador' %}
       <div style="margin-top:12px">
         <button class="btn btn-secondary" style="width:100%" onclick="openGlobalReservasModal()">
            Ver todas las reservas
         </button>
+      </div>
+      {% endif %}
+      {% if user_rol == 'Administrador' %}
+      <div style="margin-top:12px">
+        <a href="/api/mongo/asignaciones/view" target="_blank" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
+          Ver Asignaciones MongoDB
+        </a>
+      </div>
+      {% endif %}
+
+      {% if user_rol == 'Administrador' %}
+      <div style="margin-top:12px">
+        <a href="/api/mongo/seguridad/view" target="_blank" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
+          Ver Seguridad MongoDB
+        </a>
+      </div>
+      {% endif %}
+
+      {% if user_rol == 'Administrador' %}
+      <div style="margin-top:12px">
+        <a href="/api/mongo/auditorias/csv" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
+          Descargar Auditorías CSV
+        </a>
       </div>
       {% endif %}
 
