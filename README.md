@@ -474,7 +474,10 @@ Ingeniería de Sistemas
 
 Integrante:
 
+Paula Valeria Buitrago Velandia
+Juan Felipe Valderrama Peñaloza
 Sergio Mahecha Rodríguez
+
 
 ---
 
