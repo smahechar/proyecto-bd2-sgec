@@ -59,5 +59,5 @@ def get_mongo():
     port = int(os.getenv("MONGO_PORT", "27018"))
     db_name = _require_env("MONGO_DB")
     uri = f"mongodb://{host}:{port}/{db_name}"
-    client = MongoClient(uri, serverSelectionTimeoutMS=5000)
+    client = MongoClient(uri, serverSelectionTimeoutMS=2000, socketTimeoutMS=3000, connectTimeoutMS=2000, directConnection=True)
     return client[db_name]

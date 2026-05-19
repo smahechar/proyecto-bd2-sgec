@@ -112,8 +112,13 @@ def crear_reserva():
         return jsonify({"ok": False, "error": "La hora fin debe ser mayor que la hora inicio"}), 400
 
     # Block students from creating reservations
-    if session.get("rol") == "Estudiante":
-        return jsonify({"ok": False, "error": "Los estudiantes no pueden crear reservas"}), 403
+    # Solo el administrador puede crear reservas manuales.
+# Los docentes tienen horario asignado y solo pueden abrir tickets.
+    if session.get("rol") != "Administrador":
+        return jsonify({
+            "ok": False,
+            "error": "Solo el administrador puede crear reservas. Los docentes deben abrir tickets."
+        }), 403
 
     db = get_db()
     cur  = db.cursor()

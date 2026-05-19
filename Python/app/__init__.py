@@ -14,7 +14,7 @@ def create_app():
         template_folder="../templates",
         static_folder="../static"
     )
-    
+
     app.json.ensure_ascii = False
 
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "clave_temporal_desarrollo")
@@ -35,6 +35,8 @@ def create_app():
     from app.routes.admin import admin_bp
     from app.routes.mongo_test import mongo_bp
     from app.routes.mongo_reports import mongo_reports_bp
+    from app.routes.tailor import tailor_bp
+    from app.routes.tickets import tickets_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(pages_bp)
@@ -45,6 +47,9 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(mongo_bp)
     app.register_blueprint(mongo_reports_bp)
+    app.register_blueprint(tailor_bp)
+    app.register_blueprint(tickets_bp)
+    
 
     @app.errorhandler(404)
     def not_found(error):

@@ -251,104 +251,40 @@ function renderMapaBloques() {
   const cont = document.getElementById("mapaSvg");
   if (!cont) return;
 
-  const svg = `
-    <svg viewBox="0 0 1200 820" class="campus-svg">
+  cont.innerHTML = `
+    <div class="campus-map-real">
+      <!-- Zonas verdes y circulación -->
+      <div class="campus-zone green zone-1"></div>
+      <div class="campus-zone green zone-2"></div>
+      <div class="campus-zone green zone-3"></div>
+      <div class="campus-zone path zone-path-main"></div>
 
-      <!-- FILA SUPERIOR -->
-      <g data-bloque="C" class="bloque-group">
-        <rect x="150" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="210" y="150" text-anchor="middle" class="bloque-label">C</text>
-      </g>
+      <!-- Bloques válidos: A, B, C, E, F, G, I, M, O -->
+      <button class="campus-block block-a" data-bloque="A">A</button>
+      <button class="campus-block block-b" data-bloque="B">B</button>
+      <button class="campus-block block-c" data-bloque="C">C</button>
+      <button class="campus-block block-e" data-bloque="E">E</button>
+      <button class="campus-block block-f" data-bloque="F">F</button>
+      <button class="campus-block block-g" data-bloque="G">G</button>
+      <button class="campus-block block-i" data-bloque="I">I</button>
+      <button class="campus-block block-j" data-bloque="J">J</button>
+      <button class="campus-block block-m" data-bloque="M">M</button>
+      <button class="campus-block block-o" data-bloque="O">O</button>
 
-      <g data-bloque="D" class="bloque-group">
-        <rect x="300" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="360" y="150" text-anchor="middle" class="bloque-label">D</text>
-      </g>
-
-      <g data-bloque="E" class="bloque-group">
-        <rect x="450" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="510" y="150" text-anchor="middle" class="bloque-label">E</text>
-      </g>
-
-      <g data-bloque="F" class="bloque-group">
-        <rect x="600" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="660" y="150" text-anchor="middle" class="bloque-label">F</text>
-      </g>
-
-      <g data-bloque="G" class="bloque-group">
-        <rect x="750" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="810" y="150" text-anchor="middle" class="bloque-label">G</text>
-      </g>
-
-      <g data-bloque="H" class="bloque-group">
-        <rect x="900" y="80" width="120" height="120" class="bloque-shape" />
-        <text x="960" y="150" text-anchor="middle" class="bloque-label">H</text>
-      </g>
-
-      <!-- FILA MEDIA SUPERIOR -->
-      <g data-bloque="M" class="bloque-group">
-        <rect x="380" y="250" width="440" height="120" class="bloque-shape" />
-        <text x="600" y="320" text-anchor="middle" class="bloque-label">M</text>
-      </g>
-
-      <!-- FILA INTERMEDIA -->
-      <g data-bloque="B" class="bloque-group">
-        <rect x="150" y="420" width="180" height="140" class="bloque-shape" />
-        <text x="240" y="500" text-anchor="middle" class="bloque-label">B</text>
-      </g>
-
-      <g data-bloque="I" class="bloque-group">
-        <rect x="380" y="430" width="440" height="90" class="bloque-shape" />
-        <text x="600" y="485" text-anchor="middle" class="bloque-label">I</text>
-      </g>
-
-      <g data-bloque="J" class="bloque-group">
-        <rect x="850" y="420" width="180" height="140" class="bloque-shape" />
-        <text x="940" y="500" text-anchor="middle" class="bloque-label">J</text>
-      </g>
-
-      <!-- FILA INFERIOR -->
-      <g data-bloque="A" class="bloque-group">
-        <rect x="150" y="600" width="160" height="120" class="bloque-shape" />
-        <text x="230" y="670" text-anchor="middle" class="bloque-label">A</text>
-      </g>
-
-      <g data-bloque="L" class="bloque-group">
-        <rect x="360" y="590" width="250" height="130" class="bloque-shape" />
-        <text x="485" y="660" text-anchor="middle" class="bloque-label">L</text>
-      </g>
-
-      <g data-bloque="K" class="bloque-group">
-        <rect x="650" y="600" width="160" height="120" class="bloque-shape" />
-        <text x="730" y="670" text-anchor="middle" class="bloque-label">K</text>
-      </g>
-
-      <g data-bloque="N" class="bloque-group">
-        <rect x="850" y="600" width="160" height="120" class="bloque-shape" />
-        <text x="930" y="670" text-anchor="middle" class="bloque-label">N</text>
-      </g>
-
-      <!-- BLOQUE O -->
-      <g data-bloque="O" class="bloque-group">
-        <rect x="550" y="740" width="120" height="60" class="bloque-shape" />
-        <text x="610" y="780" text-anchor="middle" class="bloque-label">O</text>
-      </g>
-
-    </svg>
+      <div class="map-label label-entrada">Entrada principal</div>
+      <div class="map-label label-campus">Campus académico</div>
+      <div class="map-label label-medical">Los Cobos Medical Center</div>
+    </div>
   `;
 
-  cont.innerHTML = svg;
-
-  // Marcar el bloque seleccionado
   if (BLOQUE_SELECCIONADO) {
-    const sel = cont.querySelector(`[data-bloque="${BLOQUE_SELECCIONADO}"]`);
-    if (sel) sel.classList.add("selected");
+    const selected = cont.querySelector(`[data-bloque="${BLOQUE_SELECCIONADO}"]`);
+    if (selected) selected.classList.add("selected");
   }
 
-  // Activar clics
-  cont.querySelectorAll("[data-bloque]").forEach(el => {
-    el.addEventListener("click", () => {
-      seleccionarBloque(el.dataset.bloque);
+  cont.querySelectorAll(".campus-block").forEach(btn => {
+    btn.addEventListener("click", () => {
+      seleccionarBloque(btn.dataset.bloque);
     });
   });
 }
@@ -363,6 +299,11 @@ function seleccionarBloque(bloqueId) {
   renderMapaBloques();
   renderRoomList();
   renderEspaciosSelect();
+
+  const searchInput = document.getElementById("searchEspacio");
+  if (searchInput) {
+    searchInput.value = BLOQUE_SELECCIONADO || "";
+  }
 }
 
 // ===============================
@@ -604,8 +545,8 @@ function closeModal() {
 
 // Botón "+ Nueva" en la columna derecha
 function openModalNuevoEspacio() {
-  if (USER_ROLE === "Estudiante") {
-    alert("Como estudiante no puedes crear reservas.");
+  if (USER_ROLE !== "Administrador") {
+    alert("Solo el administrador puede crear reservas. Los docentes deben abrir tickets.");
     return;
   }
   openModal();
@@ -668,6 +609,475 @@ if (maintForm) {
   });
 }
 
+// ===============================
+// TAILOR MADE SEMESTRAL
+// ===============================
+
+function openTailorModal() {
+  const modal = document.getElementById("modalTailor");
+  const inicio = document.getElementById("fechaInicioSemestre");
+  const fin = document.getElementById("fechaFinSemestre");
+  const cont = document.getElementById("tailorResultados");
+
+  if (!modal) return;
+
+  if (inicio && !inicio.value) {
+    inicio.value = "2026-02-02";
+  }
+
+  if (fin && !fin.value) {
+    fin.value = "2026-06-12";
+  }
+
+  if (cont) {
+    cont.innerHTML = `
+      <p style="color:var(--muted)">
+        Selecciona las fechas del semestre y presiona <strong>Confirmar asignación</strong>.
+      </p>
+    `;
+  }
+
+  modal.classList.add("show");
+}
+
+function closeTailorModal() {
+  const modal = document.getElementById("modalTailor");
+  if (modal) {
+    modal.classList.remove("show");
+  }
+}
+
+async function confirmarAsignacionSemestre() {
+  const inicio = document.getElementById("fechaInicioSemestre")?.value;
+  const fin = document.getElementById("fechaFinSemestre")?.value;
+  const cont = document.getElementById("tailorResultados");
+
+  if (!inicio || !fin) {
+    alert("Debes seleccionar la fecha de inicio y la fecha de fin del semestre.");
+    return;
+  }
+
+  if (new Date(fin) <= new Date(inicio)) {
+    alert("La fecha final debe ser mayor que la fecha inicial.");
+    return;
+  }
+
+  const confirmar = confirm(
+    `¿Deseas ejecutar la asignación automática del semestre desde ${inicio} hasta ${fin}?`
+  );
+
+  if (!confirmar) return;
+
+  if (cont) {
+    cont.innerHTML = `
+      <p style="color:var(--muted)">
+        Ejecutando asignación automática. Esto puede tardar unos segundos...
+      </p>
+    `;
+  }
+
+  try {
+    const resp = await fetch("/api/tailor/asignar-semestre", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fecha_inicio: inicio,
+        fecha_fin: fin
+      })
+    });
+
+    const data = await resp.json();
+
+    if (!data.ok) {
+      cont.innerHTML = `
+        <p style="color:#ff6b8a">
+          ${data.error || "Error ejecutando la asignación automática."}
+        </p>
+      `;
+      return;
+    }
+
+    cont.innerHTML = `
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat">
+          <div>
+            <div class="stat-label">Horarios asignados</div>
+            <div class="stat-value">${data.total_asignadas}</div>
+          </div>
+          <div class="stat-badge">OK</div>
+        </div>
+
+        <div class="stat">
+          <div>
+            <div class="stat-label">Grupos rechazados</div>
+            <div class="stat-value">${data.total_rechazadas}</div>
+          </div>
+          <div class="stat-badge">Revisar</div>
+        </div>
+
+        <div class="stat">
+          <div>
+            <div class="stat-label">Reservas creadas</div>
+            <div class="stat-value">${data.total_reservas_creadas || 0}</div>
+          </div>
+          <div class="stat-badge">Semestre</div>
+        </div>
+
+        <div class="stat">
+          <div>
+            <div class="stat-label">Conflictos omitidos</div>
+            <div class="stat-value">${data.total_reservas_conflicto || 0}</div>
+          </div>
+          <div class="stat-badge">Choques</div>
+        </div>
+      </div>
+
+      <h4>Asignaciones realizadas</h4>
+
+      <div style="overflow-x:auto">
+        <table class="tabla-mongo">
+          <thead>
+            <tr>
+              <th>Clase</th>
+              <th>Grupo</th>
+              <th>Estudiantes</th>
+              <th>Salón</th>
+              <th>Capacidad</th>
+              <th>Diferencia</th>
+              <th>Día</th>
+              <th>Horario</th>
+              <th>Reservas</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(data.asignadas || []).map(a => `
+              <tr>
+                <td>${a.clase}</td>
+                <td>${a.grupo}</td>
+                <td>${a.cantidad_estudiantes}</td>
+                <td>${a.salon}</td>
+                <td>${a.capacidad}</td>
+                <td>${a.diferencia}</td>
+                <td>${a.dia}</td>
+                <td>${a.hora_inicio} - ${a.hora_fin}</td>
+                <td>${a.reservas_creadas || 0}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    if (typeof cargarDashboard === "function") cargarDashboard();
+    if (typeof cargarReservasProximas === "function") cargarReservasProximas();
+    if (typeof cargarEspacios === "function") cargarEspacios();
+
+  } catch (error) {
+    console.error(error);
+
+    if (cont) {
+      cont.innerHTML = `
+        <p style="color:#ff6b8a">
+          Error inesperado ejecutando la asignación automática.
+        </p>
+      `;
+    }
+  }
+}
+
+function closeTailorModal() {
+  document.getElementById("modalTailor").classList.remove("show");
+}
+
+async function generarCuposAleatorios() {
+  if (!confirm("¿Generar cantidades aleatorias de estudiantes para todos los grupos?")) return;
+
+  const resp = await fetch("/api/tailor/generar-cupos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      minimo: 18,
+      maximo: 70
+    })
+  });
+
+  const data = await resp.json();
+
+  if (data.ok) {
+    alert(data.msg);
+  } else {
+    alert(data.error || "Error generando cupos");
+  }
+}
+
+async function asignarSemestreTailor() {
+  openTailorModal();
+
+  const inicio = document.getElementById("fechaInicioSemestre").value || "2026-02-02";
+  const fin = document.getElementById("fechaFinSemestre").value || "2026-06-12";
+
+  const cont = document.getElementById("tailorResultados");
+  cont.innerHTML = "<p style='color:var(--muted)'>Ejecutando asignación automática...</p>";
+
+  const resp = await fetch("/api/tailor/asignar-semestre", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fecha_inicio: inicio,
+      fecha_fin: fin
+    })
+  });
+
+  const data = await resp.json();
+
+  if (!data.ok) {
+    cont.innerHTML = `<p style="color:#ff6b8a">${data.error || "Error ejecutando asignación"}</p>`;
+    return;
+  }
+
+  cont.innerHTML = `
+    <div class="stat" style="margin-bottom:12px">
+      <div>
+        <div class="stat-label">Asignadas</div>
+        <div class="stat-value">${data.total_asignadas}</div>
+      </div>
+      <div class="stat-badge">OK</div>
+    </div>
+
+    <div class="stat" style="margin-bottom:12px">
+      <div>
+        <div class="stat-label">Rechazadas</div>
+        <div class="stat-value">${data.total_rechazadas}</div>
+      </div>
+      <div class="stat-badge">Revisar</div>
+    </div>
+
+    <h4>Asignaciones realizadas</h4>
+    <div style="overflow-x:auto">
+      <table class="tabla-mongo">
+        <thead>
+          <tr>
+            <th>Clase</th>
+            <th>Grupo</th>
+            <th>Estudiantes</th>
+            <th>Salón</th>
+            <th>Capacidad</th>
+            <th>Diferencia</th>
+            <th>Día</th>
+            <th>Horario</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.asignadas.map(a => `
+            <tr>
+              <td>${a.clase}</td>
+              <td>${a.grupo}</td>
+              <td>${a.cantidad_estudiantes}</td>
+              <td>${a.salon}</td>
+              <td>${a.capacidad}</td>
+              <td>${a.diferencia}</td>
+              <td>${a.dia}</td>
+              <td>${a.hora_inicio} - ${a.hora_fin}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  cargarDashboard();
+  cargarReservasProximas();
+  cargarEspacios();
+}
+
+async function cargarHorariosSemestre() {
+  const resp = await fetch("/api/tailor/horarios");
+  const data = await resp.json();
+
+  if (!data.ok) {
+    alert("No se pudieron cargar los horarios.");
+    return;
+  }
+
+  openTablaGeneralModal("Horarios semestrales", `
+    <div style="overflow-x:auto">
+      <table class="tabla-mongo">
+        <thead>
+          <tr>
+            <th>Clase</th>
+            <th>Grupo</th>
+            <th>Docente</th>
+            <th>Espacio</th>
+            <th>Día</th>
+            <th>Horario</th>
+            <th>Estudiantes</th>
+            <th>Semestre</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.horarios.map(h => `
+            <tr>
+              <td>${h.clase}</td>
+              <td>${h.codigo_grupo}</td>
+              <td>${h.docente || "-"}</td>
+              <td>${h.espacio}</td>
+              <td>${h.dia_semana}</td>
+              <td>${h.hora_inicio} - ${h.hora_fin}</td>
+              <td>${h.cantidad_estudiantes}</td>
+              <td>${h.fecha_inicio_semestre} a ${h.fecha_fin_semestre}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `);
+}
+
+function cargarMisClasesDocente() {
+  cargarHorariosSemestre();
+}
+
+// ===============================
+// TICKETS DOCENTE / ADMIN
+// ===============================
+
+function openTicketModal() {
+  document.getElementById("modalTicket").classList.add("show");
+}
+
+function closeTicketModal() {
+  document.getElementById("modalTicket").classList.remove("show");
+}
+
+const formTicket = document.getElementById("formTicket");
+
+if (formTicket) {
+  formTicket.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const asunto = document.getElementById("ticketAsunto").value;
+    const descripcion = document.getElementById("ticketDescripcion").value;
+
+    const resp = await fetch("/api/tickets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ asunto, descripcion })
+    });
+
+    const data = await resp.json();
+
+    if (data.ok) {
+      alert("Ticket enviado correctamente.");
+      closeTicketModal();
+      formTicket.reset();
+    } else {
+      alert(data.error || "No se pudo enviar el ticket.");
+    }
+  });
+}
+
+async function cargarTickets() {
+  const resp = await fetch("/api/tickets");
+  const data = await resp.json();
+
+  if (!data.ok) {
+    alert("No se pudieron cargar los tickets.");
+    return;
+  }
+
+  openTablaGeneralModal("Tickets", `
+    <div style="overflow-x:auto">
+      <table class="tabla-mongo">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Docente</th>
+            <th>Asunto</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Respuesta</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.tickets.map(t => `
+            <tr>
+              <td>${t.id_ticket}</td>
+              <td>${t.docente_nombre || "-"}</td>
+              <td>${t.asunto}</td>
+              <td>${t.descripcion}</td>
+              <td>${t.estado}</td>
+              <td>${t.respuesta_admin || "-"}</td>
+              <td>${t.fecha_creacion}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `);
+}
+
+// ===============================
+// MODAL TABLAS GENERAL
+// ===============================
+
+function openTablaGeneralModal(titulo, contenido) {
+  document.getElementById("modalTablaTitulo").textContent = titulo;
+  document.getElementById("modalTablaContenido").innerHTML = contenido;
+  document.getElementById("modalTablaGeneral").classList.add("show");
+}
+
+function closeTablaGeneralModal() {
+  document.getElementById("modalTablaGeneral").classList.remove("show");
+}
+
+async function limpiarAsignacionAutomatica() {
+  const confirmar = confirm(
+    "¿Seguro que deseas borrar las reservas y horarios generados automáticamente? Esta acción no borra reservas manuales."
+  );
+
+  if (!confirmar) return;
+
+  try {
+    const resp = await fetch("/api/tailor/limpiar-asignacion", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await resp.json();
+
+    if (!data.ok) {
+      alert(data.error || "No se pudo limpiar la asignación automática.");
+      return;
+    }
+
+    alert(
+      `${data.msg}\n\nReservas borradas: ${data.reservas_borradas}\nHorarios borrados: ${data.horarios_borrados}`
+    );
+
+    if (typeof cargarDashboard === "function") cargarDashboard();
+    if (typeof cargarReservasProximas === "function") cargarReservasProximas();
+    if (typeof cargarEspacios === "function") cargarEspacios();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error inesperado limpiando la asignación automática.");
+  }
+}
+
+window.generarCuposAleatorios = generarCuposAleatorios;
+window.asignarSemestreTailor = asignarSemestreTailor;
+window.cargarHorariosSemestre = cargarHorariosSemestre;
+window.cargarMisClasesDocente = cargarMisClasesDocente;
+window.openTicketModal = openTicketModal;
+window.closeTicketModal = closeTicketModal;
+window.cargarTickets = cargarTickets;
+window.closeTailorModal = closeTailorModal;
+window.closeTablaGeneralModal = closeTablaGeneralModal;
 
 // Exponer funciones que se usan desde HTML
 window.openModal = openModal;
@@ -682,3 +1092,8 @@ window.handleRoomClick = handleRoomClick;
 window.openGlobalReservasModal = openGlobalReservasModal;
 window.closeGlobalReservasModal = closeGlobalReservasModal;
 window.deleteReserva = deleteReserva;
+window.openTailorModal = openTailorModal;
+window.closeTailorModal = closeTailorModal;
+window.confirmarAsignacionSemestre = confirmarAsignacionSemestre;
+window.limpiarAsignacionAutomatica = limpiarAsignacionAutomatica;
+

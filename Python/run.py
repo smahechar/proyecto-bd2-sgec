@@ -5,6 +5,8 @@ Entry point — keeps this file minimal; real logic lives in app/
 """
 
 from app import create_app
+from app.routes.tailor import tailor_bp
+print("tailor_bp url_prefix:", tailor_bp.url_prefix)
 
 app = create_app()
 

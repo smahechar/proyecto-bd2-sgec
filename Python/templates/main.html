@@ -57,7 +57,7 @@
         <!-- Se llenará dinámicamente -->
       </div>
 
-      <div style="margin-top:14px;font-size:13px;color:var(--muted)">
+      <div class="tip-panel">
         {% if user_rol == 'Estudiante' %}
           <strong>Tip:</strong> Selecciona un bloque del mapa o usa el buscador para ver la disponibilidad de los espacios.
         {% elif user_rol == 'Docente' %}
@@ -70,10 +70,15 @@
 
     <!-- COLUMNA CENTRAL -->
     <section class="stage">
-      <!-- MAPA DINÁMICO -->
+      <!-- MAPA CAMPUS -->
+    
       <div class="card floorplan">
-        <div id="mapaSvg" style="width:100%;height:100%">
-          <!-- Mapa con js -->
+        <div class="campus-map-wrapper">
+          <div class="campus-map-title">Mapa del campus - Universidad El Bosque</div>
+
+          <div id="mapaSvg">
+            <!-- El mapa se genera desde main.js -->
+          </div>
         </div>
 
         <div class="legend">
@@ -85,6 +90,9 @@
           </div>
           <div class="item">
             <div class="dot" style="background:#5b4621"></div> Mantenimiento
+          </div>
+          <div class="item">
+            <div class="dot" style="background:#00e6b8"></div> Bloque seleccionado
           </div>
         </div>
       </div>
@@ -154,10 +162,41 @@
       </div>
 
 
-       {% if user_rol == 'Administrador' %}
+      {% if user_rol == 'Administrador' %}
       <div style="margin-top:18px">
         <button class="btn" style="width:100%" onclick="exportarReporte()">
            Exportar Reporte
+        </button>
+      </div>
+      {% endif %}
+
+      {% if user_rol == 'Administrador' %}
+      <div style="margin-top:12px">
+        <button class="btn" style="width:100%" onclick="generarCuposAleatorios()">
+          Generar cupos aleatorios
+        </button>
+      </div>
+
+        <button class="btn" style="width:100%" onclick="openTailorModal()">
+          Asignar semestre automático
+        </button>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="btn btn-secondary" style="width:100%" onclick="limpiarAsignacionAutomatica()">
+          Limpiar asignación automática
+        </button>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="btn btn-secondary" style="width:100%" onclick="cargarHorariosSemestre()">
+          Ver horarios semestrales
+        </button>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="btn btn-secondary" style="width:100%" onclick="cargarTickets()">
+          Ver tickets docentes
         </button>
       </div>
       {% endif %}
@@ -203,6 +242,28 @@
         <a href="/api/mongo/auditorias/csv" class="btn btn-secondary" style="width:100%;display:block;text-align:center">
           Descargar Auditorías CSV
         </a>
+      </div>
+      {% endif %}
+
+
+    
+      {% if user_rol == 'Docente' %}
+      <div style="margin-top:12px">
+        <button class="btn btn-secondary" style="width:100%" onclick="cargarMisClasesDocente()">
+          Mis clases asignadas
+        </button>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="btn" style="width:100%" onclick="openTicketModal()">
+          Abrir ticket
+        </button>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="btn btn-secondary" style="width:100%" onclick="cargarTickets()">
+          Mis tickets
+        </button>
       </div>
       {% endif %}
 
@@ -287,6 +348,84 @@
       </form>
     </div>
   </div>
+
+  <!-- MODAL RESULTADOS TAILOR MADE -->
+<!-- MODAL RESULTADOS TAILOR MADE -->
+<div class="modal" id="modalTailor">
+  <div class="box" style="max-width:900px;max-height:80vh;overflow-y:auto">
+    <h3>Asignación automática semestral</h3>
+
+    <p style="color:var(--muted);font-size:13px">
+      Selecciona la fecha inicial y final del semestre. El sistema distribuirá los grupos durante toda la semana, desde las 07:00 hasta las 22:00, y repetirá el horario hasta finalizar el semestre.
+    </p>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1">
+        <label>Inicio del semestre</label>
+        <input id="fechaInicioSemestre" type="date" style="width:100%">
+      </div>
+
+      <div style="flex:1">
+        <label>Fin del semestre</label>
+        <input id="fechaFinSemestre" type="date" style="width:100%">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:15px">
+      <button class="btn" style="flex:1" onclick="confirmarAsignacionSemestre()">
+        Confirmar asignación
+      </button>
+
+      <button class="btn btn-secondary" style="flex:1" onclick="closeTailorModal()">
+        Cancelar
+      </button>
+    </div>
+
+    <div id="tailorResultados">
+      <p style="color:var(--muted)">Aquí aparecerán los resultados de asignación.</p>
+    </div>
+  </div>
+</div>
+<!-- MODAL TICKETS -->
+<div class="modal" id="modalTicket">
+  <div class="box">
+    <h3>Abrir ticket para administración</h3>
+
+    <form id="formTicket">
+      <div class="form-row">
+        <div style="flex:1">
+          <label>Asunto *</label>
+          <input id="ticketAsunto" required placeholder="Ej: Cambio de salón, inconveniente de horario...">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div style="flex:1">
+          <label>Descripción *</label>
+          <textarea id="ticketDescripcion" required placeholder="Describe el problema o solicitud"></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button type="submit" class="btn" style="flex:1">Enviar ticket</button>
+        <button type="button" class="btn btn-secondary" style="flex:1" onclick="closeTicketModal()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL TABLAS GENERALES -->
+<div class="modal" id="modalTablaGeneral">
+  <div class="box" style="max-width:1000px;max-height:80vh;overflow-y:auto">
+    <h3 id="modalTablaTitulo">Información</h3>
+    <div id="modalTablaContenido"></div>
+    <button class="btn btn-secondary" style="margin-top:15px" onclick="closeTablaGeneralModal()">
+      Cerrar
+    </button>
+  </div>
+</div>
 
   <footer>Universidad El Bosque - SGEC 2025</footer>
 
