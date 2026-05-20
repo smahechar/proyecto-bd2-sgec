@@ -174,3 +174,36 @@ def registrar_historial(db, id_espacio, estado_anterior, estado_nuevo, user_id):
         print(f"[HISTORIAL] ERROR: {exc}")
     finally:
         cur.close()
+
+from datetime import datetime
+from flask import request
+from app.db import get_mongo_db
+
+
+def registrar_evento_seguridad_mongo(tipo, descripcion, usuario_id=None, correo=None, detalle=None):
+    """
+    Registra eventos de seguridad en MongoDB.
+    Ejemplos:
+    - LOGIN_FAIL
+    - LOGIN_OK
+    - INTENTO_NO_AUTORIZADO
+    - ROL_NO_COINCIDE
+    """
+    try:
+        mongo = get_mongo_db()
+
+        doc = {
+            "tipo": tipo,
+            "modulo": "Auth",
+            "descripcion": descripcion,
+            "usuario_id": usuario_id,
+            "correo": correo,
+            "ip": request.remote_addr if request else None,
+            "fecha": datetime.utcnow(),
+            "detalle": detalle or {}
+        }
+
+        mongo.eventos_seguridad.insert_one(doc)
+
+    except Exception as exc:
+        print(f"[MONGO-SECURITY] ERROR registrando evento de seguridad: {exc}")

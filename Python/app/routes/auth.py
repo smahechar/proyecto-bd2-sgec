@@ -12,6 +12,8 @@ Security hardening
   • Audit events written to MongoDB on success AND failure
 """
 
+from app.utils import registrar_auditoria_mongo, registrar_evento_seguridad_mongo
+
 from flask import (
     Blueprint, request, jsonify, redirect,
     session, render_template, flash,
@@ -62,10 +64,22 @@ def login():
     try:
         correo = validate_email(request.form.get("correo", ""))
     except ValueError:
+        
         return jsonify({"ok": False, "msg": "Credenciales inválidas"}), 400
 
     contrasena = request.form.get("contrasena", "")
     if not contrasena or len(contrasena) > 128:
+        registrar_evento_seguridad_mongo(
+            "LOGIN_INPUT_INVALID",
+            f"Intento de login con contraseña inválida para {correo}",
+            usuario_id=None,
+            correo=correo,
+            detalle={
+                "ip": request.remote_addr,
+                "motivo": "Contraseña vacía o demasiado larga"
+            }
+        )
+
         return jsonify({"ok": False, "msg": "Credenciales inválidas"}), 400
 
     rol_seleccionado = request.form.get("rol", "")
@@ -91,18 +105,59 @@ def login():
 
         if not user or not check_password_hash(user["contrasena"], contrasena):
             registrar_auditoria_mongo(
-                "LOGIN_FAIL", "Auth",
+                "LOGIN_FAIL",
+                "Auth",
                 f"Intento fallido para {correo}",
-                extra={"ip": request.remote_addr},
+                usuario_id=None,
+                extra={
+                    "correo": correo,
+                    "ip": request.remote_addr,
+                    "motivo": "Correo inexistente o contraseña incorrecta"
+                },
             )
+
+            registrar_evento_seguridad_mongo(
+                "LOGIN_FAIL",
+                f"Intento fallido para {correo}",
+                usuario_id=None,
+                correo=correo,
+                detalle={
+                    "ip": request.remote_addr,
+                    "motivo": "Correo inexistente o contraseña incorrecta"
+                }
+            )
+
             return jsonify({"ok": False, "msg": _fail_msg}), 401
 
         if rol_seleccionado and user["nombre_rol"] != rol_seleccionado:
+                    
             registrar_auditoria_mongo(
-                "LOGIN_FAIL", "Auth",
+                "LOGIN_FAIL",
+                "Auth",
                 f"Rol incorrecto para {correo}",
-                extra={"ip": request.remote_addr},
+                usuario_id=user["id_usuario"],
+                extra={
+                    "correo": correo,
+                    "ip": request.remote_addr,
+                    "rol_seleccionado": rol_seleccionado,
+                    "rol_real": user["nombre_rol"],
+                    "motivo": "Rol no coincide"
+                },
             )
+
+            registrar_evento_seguridad_mongo(
+                "ROL_NO_COINCIDE",
+                f"Rol incorrecto para {correo}",
+                usuario_id=user["id_usuario"],
+                correo=correo,
+                detalle={
+                    "ip": request.remote_addr,
+                    "rol_seleccionado": rol_seleccionado,
+                    "rol_real": user["nombre_rol"],
+                    "motivo": "Rol no coincide"
+                }
+            )
+
             return jsonify({"ok": False, "msg": _fail_msg}), 401
 
         # ── Session fixation mitigation ──
@@ -152,8 +207,19 @@ def register():
 
     try:
         correo = validate_email(request.form.get("correo", ""))
-    except ValueError as e:
-        errors.append(str(e))
+    except ValueError:
+        registrar_evento_seguridad_mongo(
+            "LOGIN_INPUT_INVALID",
+            "Intento de login con correo inválido",
+            usuario_id=None,
+            correo=request.form.get("correo", ""),
+            detalle={
+                "ip": request.remote_addr,
+                "motivo": "Formato de correo inválido"
+            }
+        )
+
+        return jsonify({"ok": False, "msg": "Credenciales inválidas"}), 400
 
     try:
         contrasena = validate_password(request.form.get("contrasena", ""))

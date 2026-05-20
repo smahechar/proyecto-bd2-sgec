@@ -61,3 +61,25 @@ def get_mongo():
     uri = f"mongodb://{host}:{port}/{db_name}"
     client = MongoClient(uri, serverSelectionTimeoutMS=2000, socketTimeoutMS=3000, connectTimeoutMS=2000, directConnection=True)
     return client[db_name]
+
+
+def get_mongo_db():
+    """
+    Retorna la base de datos MongoDB configurada en el archivo .env.
+    Se usa para auditorías, eventos de seguridad y estadísticas.
+    """
+    mongo_host = os.getenv("MONGO_HOST", "192.168.56.101")
+    mongo_port = int(os.getenv("MONGO_PORT", "27018"))
+    mongo_db = os.getenv("MONGO_DB", "sgec_logs")
+
+    uri = f"mongodb://{mongo_host}:{mongo_port}/{mongo_db}?directConnection=true"
+
+    client = MongoClient(
+        uri,
+        serverSelectionTimeoutMS=3000,
+        socketTimeoutMS=5000,
+        connectTimeoutMS=3000,
+        directConnection=True
+    )
+
+    return client[mongo_db]

@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, Response, render_template_string
 from app.db import get_mongo
 from app.decorators import admin_required
+from flask import session
+from app.decorators import login_required
+from app.db import get_mongo_db
 import csv
 import io
 import html
@@ -441,41 +444,168 @@ def mongo_asignaciones_view():
         return "Error consultando asignaciones MongoDB", 500
 
 
+
+    
 @mongo_reports_bp.route("/seguridad/view")
-@admin_required
+@login_required
 def mongo_seguridad_view():
+    if session.get("rol") != "Administrador":
+        return "No autorizado", 403
+
     try:
-        mongo = get_mongo()
-        docs = list(
-            mongo.audit_logs.find({
-                "accion": {"$in": ["LOGIN_OK", "LOGIN_FAIL", "LOGOUT", "REGISTER"]}
-            })
+        mongo = get_mongo_db()
+
+        eventos = list(
+            mongo.eventos_seguridad
+            .find({})
             .sort("fecha", -1)
-            .limit(200)
+            .limit(100)
         )
 
         rows = ""
-        for doc in docs:
+
+        for ev in eventos:
+            fecha = ev.get("fecha", "")
+            tipo = ev.get("tipo", "-")
+            modulo = ev.get("modulo", "-")
+            descripcion = ev.get("descripcion", "-")
+            correo = ev.get("correo", "-")
+            usuario_id = ev.get("usuario_id", "-")
+            ip = ev.get("ip", "-")
+            detalle = ev.get("detalle", {})
+
+            motivo = detalle.get("motivo", "-") if isinstance(detalle, dict) else "-"
+            rol = detalle.get("rol", "-") if isinstance(detalle, dict) else "-"
+            rol_seleccionado = detalle.get("rol_seleccionado", "-") if isinstance(detalle, dict) else "-"
+            rol_real = detalle.get("rol_real", "-") if isinstance(detalle, dict) else "-"
+
             rows += f"""
-            <tr>
-                <td>{_esc(doc.get("fecha"))}</td>
-                <td>{_esc(doc.get("accion"))}</td>
-                <td>{_esc(doc.get("usuario_id"))}</td>
-                <td>{_esc(doc.get("ip"))}</td>
-                <td>{_esc(doc.get("descripcion"))}</td>
-            </tr>
+                <tr>
+                    <td>{fecha}</td>
+                    <td>{tipo}</td>
+                    <td>{modulo}</td>
+                    <td>{correo}</td>
+                    <td>{usuario_id}</td>
+                    <td>{ip}</td>
+                    <td>{descripcion}</td>
+                    <td>{motivo}</td>
+                    <td>{rol}</td>
+                    <td>{rol_seleccionado}</td>
+                    <td>{rol_real}</td>
+                </tr>
             """
 
         if not rows:
-            rows = '<tr><td colspan="5">No hay eventos de seguridad para mostrar.</td></tr>'
+            rows = """
+                <tr>
+                    <td colspan="11" style="text-align:center;color:#94a3b8;">
+                        No hay eventos de seguridad registrados en MongoDB.
+                    </td>
+                </tr>
+            """
 
-        return _mongo_page(
-            "Eventos de Seguridad MongoDB",
-            "Accesos, cierres de sesión, registros e intentos fallidos.",
-            ["Fecha", "Acción", "Usuario", "IP", "Descripción"],
-            rows
-        )
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Eventos de Seguridad MongoDB</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    background: #071023;
+                    color: #e5f7ff;
+                    padding: 24px;
+                }}
+
+                h1 {{
+                    color: #00e6b8;
+                    margin-bottom: 8px;
+                }}
+
+                p {{
+                    color: #94a3b8;
+                    margin-bottom: 20px;
+                }}
+
+                table {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    background: rgba(15, 35, 55, 0.8);
+                    border-radius: 12px;
+                    overflow: hidden;
+                }}
+
+                th, td {{
+                    padding: 10px;
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                    font-size: 13px;
+                    vertical-align: top;
+                }}
+
+                th {{
+                    background: rgba(0, 230, 184, 0.14);
+                    color: #00e6b8;
+                    text-align: left;
+                }}
+
+                tr:hover {{
+                    background: rgba(0, 230, 184, 0.06);
+                }}
+
+                .badge {{
+                    display: inline-block;
+                    padding: 4px 8px;
+                    border-radius: 999px;
+                    background: rgba(0, 230, 184, 0.12);
+                    color: #00e6b8;
+                    font-weight: bold;
+                }}
+
+                .back {{
+                    display: inline-block;
+                    margin-bottom: 16px;
+                    color: #00e6b8;
+                    text-decoration: none;
+                    font-weight: bold;
+                }}
+            </style>
+        </head>
+        <body>
+            <a class="back" href="/home">← Volver al dashboard</a>
+
+            <h1>Eventos de Seguridad - MongoDB</h1>
+            <p>
+                Esta vista muestra los eventos reales guardados en la colección
+                <strong>eventos_seguridad</strong>.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Módulo</th>
+                        <th>Correo</th>
+                        <th>Usuario ID</th>
+                        <th>IP</th>
+                        <th>Descripción</th>
+                        <th>Motivo</th>
+                        <th>Rol</th>
+                        <th>Rol seleccionado</th>
+                        <th>Rol real</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        </body>
+        </html>
+        """
+
+        return html
 
     except Exception as exc:
         print(f"[MONGO VIEW] seguridad: {exc}")
-        return "Error consultando seguridad MongoDB", 500
+        return f"Error cargando eventos de seguridad desde MongoDB: {exc}", 500

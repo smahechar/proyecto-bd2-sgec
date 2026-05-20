@@ -1,3 +1,5 @@
+from app.utils.security import registrar_evento_seguridad_mongo
+
 from app.utils.security import (
     validate_email,
     validate_password,
